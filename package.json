@@ -1,0 +1,28 @@
+{
+  "type": "module",
+  "scripts": {
+    "generate": "node generate.js",
+    "run:pbean": "npm run generate && nwbuild --mode=run --flavor=sdk --glob=false ./out/pbean",
+    "run:vbean": "npm run generate && nwbuild --mode=run --flavor=sdk --glob=false ./out/vbean",
+    "build:pbean-win": "cd ./out/pbean && nwbuild --mode=build --platform=win --arch=x64 --glob=false --cacheDir=../../cache --outDir=../pbean-windows-x64 .",
+    "build:pbean-linux": "cd ./out/pbean && nwbuild --mode=build --platform=linux --arch=x64 --glob=false --cacheDir=../../cache --outDir=../pbean-linux-x64 .",
+    "build:pbean-osx": "cd ./out/pbean && nwbuild --mode=build --platform=osx --arch=x64 --glob=false --cacheDir=../../cache --outDir=../pbean-osx-x64 .",
+    "build:pbean-apple": "cd ./out/pbean && nwbuild --mode=build --platform=osx --arch=arm64 --glob=false --cacheDir=../../cache --outDir=../pbean-osx-apple-silicon .",
+    "build:vbean-win": "cd ./out/vbean && nwbuild --mode=build --platform=win --arch=x64 --glob=false --cacheDir=../../cache --outDir=../vbean-windows-x64 .",
+    "build:vbean-linux": "cd ./out/vbean && nwbuild --mode=build --platform=linux --arch=x64 --glob=false --cacheDir=../../cache --outDir=../vbean-linux-x64 .",
+    "build:vbean-osx": "cd ./out/vbean && nwbuild --mode=build --platform=osx --arch=x64 --glob=false --cacheDir=../../cache --outDir=../vbean-osx-x64 .",
+    "build:vbean-apple": "cd ./out/vbean && nwbuild --mode=build --platform=osx --arch=arm64 --glob=false --cacheDir=../../cache --outDir=../vbean-osx-apple-silicon .",
+    "build:pbean": "npm run build:pbean-win && npm run build:pbean-linux && npm run build:pbean-osx && npm run build:pbean-apple",
+    "build:vbean": "npm run build:vbean-win && npm run build:vbean-linux && npm run build:vbean-osx && npm run build:vbean-apple",
+    "build:win": "npm run build:pbean-win && npm run build:vbean-win",
+    "build:linux": "npm run build:pbean-linux && npm run build:vbean-linux",
+    "build:osx": "npm run build:pbean-osx && npm run build:vbean-osx",
+    "build:apple": "npm run build:pbean-apple && npm run build:vbean-apple",
+    "build": "npm run build:pbean && npm run build:vbean"
+  },
+  "devDependencies": {
+    "@types/node": "^22.13.10",
+    "@types/nw.js": "^0.92.0",
+    "nw-builder": "^4.13.11"
+  }
+}
