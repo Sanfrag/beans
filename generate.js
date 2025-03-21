@@ -4,12 +4,12 @@ const VARIANTS = [
   {
     name: "pbean",
     target: "aHR0cHM6Ly93d3cucGhvdG9wZWEuY29t",
-    icon: "./icons/pbean.png",
+    icon: "./icons/512/pbean.png",
   },
   {
     name: "vbean",
     target: "aHR0cHM6Ly93d3cudmVjdG9ycGVhLmNvbQ",
-    icon: "./icons/vbean.png",
+    icon: "./icons/512/vbean.png",
   },
 ];
 
