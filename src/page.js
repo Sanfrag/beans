@@ -13,6 +13,26 @@ const __utb = (uri) => {
   return new Blob([window.__nbf.from(data[1], "base64")], { type: mime });
 };
 
+// fake queryLocalFonts
+window.queryLocalFonts = async () => {
+  const fonts = new URL(`${window.__api}/fonts`);
+  const response = await fetch(fonts);
+  const data = await response.json();
+
+  return data.map((item) => {
+    item.blob = async () => {
+      const query = new URL(
+        `${window.__api}/loadFont?file=${encodeURIComponent(item.file)}`
+      );
+      const response = await fetch(query);
+      return new Blob([await response.arrayBuffer()], {
+        type: response.headers.get("Content-Type"),
+      });
+    };
+    return item;
+  });
+};
+
 // fake navigator.clipboard.read via nw.Clipboard
 
 const clipboardTypes = {

@@ -1,4 +1,6 @@
 const http = require("http");
+const { spawn } = require("child_process");
+const fs = require("fs");
 
 const __r = (d) => {
   if (typeof d === "string") return atob(d);
@@ -10,6 +12,47 @@ const __r = (d) => {
 };
 const __s = (d) => JSON.stringify(__r(d));
 
+const queryLocalFonts = async () => {
+  return new Promise((resolve, reject) => {
+    const { stdout, stderr } = spawn(
+      `fc-list --format "%{file}:%{postscriptname}:%{family[0]}:%{fullname[0]}:%{style[0]}\n"`,
+      {
+        shell: true,
+        stdio: "pipe",
+      }
+    );
+
+    let fullData = "";
+    stdout.on("data", (data) => {
+      fullData += data.toString();
+    });
+    stderr.on("data", (data) => {
+      resolve([]);
+    });
+    stdout.on("close", () => {
+      const list = fullData
+        .split("\n")
+        .map((line) => {
+          const items = line.split(":");
+          if (items.length !== 5) return null;
+          const [file, postscriptName, family, fullName, style] = items;
+          return {
+            blob: async () => {
+              fileToBlob(file);
+            },
+            file,
+            postscriptName,
+            family,
+            fullName,
+            style,
+          };
+        })
+        .filter((item) => item && item.style && item.fullName);
+      resolve(list);
+    });
+  });
+};
+
 const bQ = Math.floor(Date.now() / ((365.25 * 24 * 60 * 6e4) / 12));
 const YWl1 = {};
 YWl1[btoa(`${__r("bQ")}${bQ}`)] = 9007199254740991;
@@ -18,7 +61,7 @@ YWl1[btoa(`${__r("bQ")}${bQ + 1}`)] = 9007199254740991;
 
 const clipboard = nw.Clipboard.get();
 
-/** @type {Record<string, (req: http.IncomingMessage, res: http.ServerResponse) => void>} */
+/** @type {Record<string, (req: http.IncomingMessage, res: http.ServerResponse, url: URL) => void>} */
 const END_POINTS = {
   "L3BhcGkvcmVjb3JkX25ldy5waHA=": (req, res) => {
     res.writeHead(200);
@@ -47,6 +90,26 @@ const END_POINTS = {
       )
     );
   },
+  L2ZvbnRz: async (req, res) => {
+    const result = await queryLocalFonts();
+    res.writeHead(200);
+    res.end(JSON.stringify(result));
+  },
+  L2xvYWRGb250: (req, res, url) => {
+    const file = url.searchParams.get("file");
+    fs.readFile(file, (err, data) => {
+      if (err) {
+        res.writeHead(404);
+        res.end();
+        return;
+      }
+      res.writeHead(200, {
+        "Content-Type": "application/octet-stream",
+        "Content-Length": data.length,
+      });
+      res.end(data);
+    });
+  },
 };
 
 const server = http.createServer((req, res) => {
@@ -60,7 +123,7 @@ const server = http.createServer((req, res) => {
   const url = new URL(`http://internal${req.url}`);
   const handler = END_POINTS[btoa(url.pathname)];
   if (handler) {
-    handler(req, res);
+    handler(req, res, url);
     return;
   }
 
