@@ -32,9 +32,10 @@ const generate = () => {
           main: "./index.js",
           name: name,
           product_string: name,
-          inject_js_start: "./inject.js",
+          inject_js_start: "./page.js",
           "chromium-args": "--ozone-platform-hint=auto --enable-wayland-ime",
-          version: "0.0.1",
+          version: "0.0.2",
+          dom_storage_quota: 4095,
           window: {
             icon: "./icon.png",
           },
@@ -43,10 +44,7 @@ const generate = () => {
         2
       )
     );
-    fs.copyFileSync(
-      `${dirname}/src/inject.js`,
-      `${dirname}/out/${name}/inject.js`
-    );
+    fs.copyFileSync(`${dirname}/src/page.js`, `${dirname}/out/${name}/page.js`);
     fs.copyFileSync(`${dirname}/${icon}`, `${dirname}/out/${name}/icon.png`);
   }
 };
