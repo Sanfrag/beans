@@ -24,12 +24,13 @@ const generate = () => {
     const name = variant.name;
     fs.rmSync(`${dirname}/out/${name}`, { recursive: true, force: true });
     fs.mkdirSync(`${dirname}/out/${name}`, { recursive: true });
-    fs.cpSync(`${dirname}/src`, `${dirname}/out/${name}`, { recursive: true });
-    const file = fs.readFileSync(`${dirname}/out/${name}/index.js`, "utf8");
+
+    const file = fs.readFileSync(`${dirname}/src/index.js`, "utf-8");
     const newFile = file
       .replace("<<target>>", `${target}`)
       .replace("<<ci>>", `${variant.ci}`);
     fs.writeFileSync(`${dirname}/out/${name}/index.js`, newFile);
+    fs.cpSync(`${dirname}/src/page.js`, `${dirname}/out/${name}/page.js`);
     fs.writeFileSync(
       `${dirname}/out/${name}/package.json`,
       JSON.stringify(
