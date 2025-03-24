@@ -4,11 +4,13 @@ const VARIANTS = [
   {
     name: "pbean",
     target: "aHR0cHM6Ly93d3cucGhvdG9wZWEuY29t",
+    ci: "eyJlbnZpcm9ubWVudCI6eyJtZW51cyI6WzEsMSwxLDEsMSwxLDEsMSxbMSwxLDAsMSwxXV19fQ",
     icon: "./icons/512/pbean.png",
   },
   {
     name: "vbean",
     target: "aHR0cHM6Ly93d3cudmVjdG9ycGVhLmNvbQ",
+    ci: "eyJlbnZpcm9ubWVudCI6eyJtZW51cyI6WzEsMSwxLDEsMSxbMSwxLDBdXX19",
     icon: "./icons/512/vbean.png",
   },
 ];
@@ -20,10 +22,13 @@ const generate = () => {
     const target = variant.target;
     const icon = variant.icon;
     const name = variant.name;
-    const file = fs.readFileSync(`${dirname}/src/index.js`, "utf8");
-    const newFile = file.replace("<<target>>", `${target}`);
     fs.rmSync(`${dirname}/out/${name}`, { recursive: true, force: true });
     fs.mkdirSync(`${dirname}/out/${name}`, { recursive: true });
+    fs.cpSync(`${dirname}/src`, `${dirname}/out/${name}`, { recursive: true });
+    const file = fs.readFileSync(`${dirname}/out/${name}/index.js`, "utf8");
+    const newFile = file
+      .replace("<<target>>", `${target}`)
+      .replace("<<ci>>", `${variant.ci}`);
     fs.writeFileSync(`${dirname}/out/${name}/index.js`, newFile);
     fs.writeFileSync(
       `${dirname}/out/${name}/package.json`,
@@ -33,8 +38,10 @@ const generate = () => {
           name: name,
           product_string: name,
           inject_js_start: "./page.js",
-          "chromium-args": "--ozone-platform-hint=auto --enable-wayland-ime",
+          "chromium-args":
+            "--ozone-platform-hint=auto --enable-wayland-ime --disable-web-security",
           version: "0.0.2",
+          "node-remote": [atob(target)],
           dom_storage_quota: 4095,
           window: {
             icon: "./icon.png",
