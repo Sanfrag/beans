@@ -30,7 +30,6 @@ const generate = () => {
       .replace("<<target>>", `${target}`)
       .replace("<<ci>>", `${variant.ci}`);
     fs.writeFileSync(`${dirname}/out/${name}/index.js`, newFile);
-    fs.cpSync(`${dirname}/src/page.js`, `${dirname}/out/${name}/page.js`);
     fs.writeFileSync(
       `${dirname}/out/${name}/package.json`,
       JSON.stringify(

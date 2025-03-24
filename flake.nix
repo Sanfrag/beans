@@ -55,10 +55,11 @@
 
           buildPhase = ''
             runHook preBuild
-
             cp -r ${src}/* .
+            mkdir -p out/${name}
+            ls -la
+            ls -la out
             node generate.js
-
             runHook postBuild
           '';
 
