@@ -112,6 +112,71 @@ window.addEventListener = function (type) {
   return __wael.apply(this, arguments);
 };
 
+let __cop;
+
+/** @type {typeof import("fs")} */
+const fs = nw.require("fs");
+/** @type {typeof import("path")} */
+const path = nw.require("path");
+
+const _dael = HTMLDivElement.prototype.addEventListener;
+HTMLDivElement.prototype.addEventListener = function (type, listener) {
+  if (this.className == "body" && type === "drop") {
+    __cop = (filePath) => {
+      const file = new File(filePath, path.basename(filePath));
+      listener({
+        dataTransfer: {
+          getData: () => "",
+          files: [file],
+          items: [
+            {
+              getAsFileSystemHandle: async () => ({
+                name: file.name,
+                createWritable: () => {
+                  return new Promise((resolve, reject) => {
+                    const stream = fs.createWriteStream(filePath, {
+                      encoding: "binary",
+                    });
+                    stream.on("error", (err) => {
+                      reject(err);
+                      alert(err.message);
+                    });
+                    stream.on("open", () => {
+                      resolve({
+                        write: (data) => stream.write(Buffer.from(data)),
+                        close: () => {
+                          stream.end(), stream.close();
+                        },
+                      });
+                    });
+                  });
+                },
+              }),
+            },
+          ],
+        },
+        stopPropagation: () => {},
+        preventDefault: () => {},
+        currentTarget: {
+          className: "fake",
+        },
+      });
+    };
+
+    if (__lf) {
+      for (const filePath of __lf) {
+        __cop(filePath);
+      }
+      __lf.splice(0, __lf.length);
+    }
+
+    if (__it) {
+      __it.__cop = __cop;
+    }
+  }
+  return _dael.apply(this, arguments);
+};
+
 const __st = () => {
   const head = document.head;
   if (head) {

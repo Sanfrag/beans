@@ -1,4 +1,5 @@
 const http = require("http");
+const path = require("path");
 
 const __r = (d) => {
   if (typeof d === "string") return atob(d);
@@ -80,14 +81,106 @@ const server = http.createServer((req, res) => {
   res.end();
 });
 
+const __ci = {
+  ZW52aXJvbm1lbnQ: {
+    bWVudXM: JSON.parse(atob("<<ci>>")),
+  },
+};
+
+const __it = {};
+
+const dirbasename = "/" + path.basename(__dirname);
+
+const openHandler = (args) => {
+  try {
+    const files = args.flatMap((args) => {
+      let cur = "";
+      let phrase = false;
+      let escape = false;
+      const parts = [];
+      for (const char of args) {
+        if (escape) {
+          if (char == '"') cur += char;
+          else cur += "\\" + char;
+          escape = false;
+        } else if (char === "\\") {
+          escape = true;
+        } else if (char === " ") {
+          if (phrase) {
+            cur += char;
+          } else {
+            parts.push(cur);
+            cur = "";
+          }
+        } else if (char === '"') {
+          phrase = !phrase;
+        } else {
+          cur += char;
+        }
+      }
+      parts.push(cur);
+      return parts.filter(
+        (part) =>
+          !part.startsWith("-") &&
+          part != "nw" &&
+          !part.endsWith("/nw") &&
+          !part.endsWith(dirbasename)
+      );
+    });
+
+    for (const arg of files) {
+      process.stdout.write("Opening File: ");
+      process.stdout.write(arg);
+      process.stdout.write("\n");
+
+      process.stdout.write("Type: ");
+      process.stdout.write(typeof __it);
+      process.stdout.write("\n");
+
+      process.stdout.write("Type: ");
+      process.stdout.write(typeof __it.__cop);
+      process.stdout.write("\n");
+
+      if (__it.__cop) __it.__cop(arg);
+    }
+  } catch (e) {
+    process.stdout.write("Open error: ");
+    process.stdout.write(e.toString());
+    process.stdout.write("\n");
+  }
+};
+
+nw.App.onOpen.addListener((args) => {
+  openHandler(args.filter((arg) => !arg.startsWith("--")));
+});
+
+const __lf = [];
+
+try {
+  if (nw.App.argv) {
+    for (const arg of nw.App.argv) {
+      process.stdout.write("Opening File: ");
+      process.stdout.write(arg);
+      process.stdout.write("\n");
+      __lf.push(arg);
+    }
+  }
+} catch (e) {
+  process.stdout.write("Launch error: ");
+  process.stdout.write(e.toString());
+  process.stdout.write("\n");
+}
+
 server.listen(0, "localhost", () => {
   const { port } = server.address();
   nw.Window.open(
-    __r("<<target>>") + "#" + encodeURIComponent(atob("<<ci>>")),
+    __r("<<target>>") + "#" + encodeURIComponent(__s(__ci)),
     { id: "pbean", icon: "./icon.png" },
     (win) => {
       win.window.__nwc = clipboard;
       win.window.__nbf = Buffer;
+      win.window.__lf = __lf;
+      win.window.__it = __it;
       win.window.__api = `http://localhost:${port}`;
     }
   );

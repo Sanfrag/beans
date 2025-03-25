@@ -27,10 +27,56 @@
             desktopName = title;
             comment = description;
             name = pname;
-            exec = pname;
+            exec = "${pname} %F";
             icon = pname;
             terminal = false;
             categories = [ "Graphics" ];
+            mimeTypes = [
+              "image/vnd.adobe.photoshop"
+              "application/x-photoshop"
+              "application/illustrator"
+              "application/x-zerosize"
+              "image/x-xcf"
+              "application/x-cabri"
+              "application/vnd.corel-draw"
+              "image/png"
+              "image/svg+xml"
+              "image/x-eps"
+              "application/pdf"
+              "image/wmf"
+              "image/emf"
+              "image/jpeg"
+              "image/gif"
+              "image/webp"
+              "image/vnd.microsoft.icon"
+              "image/x-icns"
+              "image/bmp"
+              "image/avif"
+              "image/heif"
+              "image/jxl"
+              "image/x-portable-pixmap"
+              "image/x-portable-graymap"
+              "image/x-portable-bitmap"
+              "image/tiff"
+              "image/x-dds"
+              "image/x-ilbm"
+              "image/x-exr"
+              "image/x-hdr"
+              "image/x-tga"
+              "image/x-adobe-dng"
+              "image/x-nikon-nef"
+              "image/x-canon-cr2"
+              "image/x-canon-cr3"
+              "image/x-sony-arw"
+              "image/x-panasonic-rw2"
+              "image/x-fuji-raf"
+              "image/x-olympus-orf"
+              "image/x-kde-raw"
+              "image/apng"
+              "video/mp4"
+              "video/webm"
+              "video/x-matroska"
+            ];
           };
 
         in
@@ -95,7 +141,7 @@
           title = builtins.fromJSON ''"\u0050\u0068\u006f\u0074\u006f\u0070\u0065\u0061"'';
           description = builtins.fromJSON ''"\u0052\u0061\u0073\u0074\u0065\u0072\u0020\u0067\u0072\u0061\u0070\u0068\u0069\u0063\u0073\u0020\u0065\u0064\u0069\u0074\u006f\u0072"'';
           inherit system;
-          version = "0.0.3";
+          version = "0.0.4";
         };
         vbean = mkBeans {
           name = "vbean";
@@ -103,7 +149,7 @@
           title = builtins.fromJSON ''"\u0056\u0065\u0063\u0074\u006f\u0072\u0070\u0065\u0061"'';
           description = builtins.fromJSON ''"\u0056\u0065\u0063\u0074\u006f\u0072\u0020\u0067\u0072\u0061\u0070\u0068\u0069\u0063\u0073\u0020\u0065\u0064\u0069\u0074\u006f\u0072"'';
           inherit system;
-          version = "0.0.3";
+          version = "0.0.4";
         };
       });
     };

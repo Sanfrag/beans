@@ -4,13 +4,13 @@ const VARIANTS = [
   {
     name: "pbean",
     target: "aHR0cHM6Ly93d3cucGhvdG9wZWEuY29t",
-    ci: "eyJlbnZpcm9ubWVudCI6eyJtZW51cyI6WzEsMSwxLDEsMSwxLDEsMSxbMSwxLDAsMSwxXV19fQ",
+    ci: "WzEsMSwxLDEsMSwxLDEsMSxbMSwxLDAsMSwxXV0",
     icon: "./icons/512/pbean.png",
   },
   {
     name: "vbean",
     target: "aHR0cHM6Ly93d3cudmVjdG9ycGVhLmNvbQ",
-    ci: "eyJlbnZpcm9ubWVudCI6eyJtZW51cyI6WzEsMSwxLDEsMSxbMSwxLDBdXX19",
+    ci: "WzEsMSwxLDEsMSxbMSwxLDBdXQ",
     icon: "./icons/512/vbean.png",
   },
 ];

@@ -2,8 +2,8 @@
   "type": "module",
   "scripts": {
     "generate": "node generate.js",
-    "run:pbean": "npm run generate && nwbuild --mode=run --flavor=sdk --glob=false ./out/pbean",
-    "run:vbean": "npm run generate && nwbuild --mode=run --flavor=sdk --glob=false ./out/vbean",
+    "run:pbean": "npm run generate && node run.js pbean",
+    "run:vbean": "npm run generate && node run.js vbean",
     "build:pbean-win": "cd ./out/pbean && nwbuild --mode=build --platform=win --arch=x64 --glob=false --cacheDir=../../cache --outDir=../pbean-windows-x64 .",
     "build:pbean-linux": "cd ./out/pbean && nwbuild --mode=build --platform=linux --arch=x64 --glob=false --cacheDir=../../cache --outDir=../pbean-linux-x64 .",
     "build:pbean-osx": "cd ./out/pbean && nwbuild --mode=build --platform=osx --arch=x64 --glob=false --cacheDir=../../cache --outDir=../pbean-osx-x64 .",
