@@ -1,7 +1,5 @@
 import nwbuild from "nw-builder";
 
-console.log(process.argv.slice(3));
-
 nwbuild({
   mode: "run",
   flavor: "sdk",
