@@ -30,6 +30,7 @@ const __sio = String.prototype.indexOf;
 String.prototype.indexOf = function (target) {
   if (this.length === 0 && target === ".") {
     window.self = __ws;
+    String.prototype.indexOf = __sio;
     return 1;
   }
   return __sio.apply(this, arguments);
