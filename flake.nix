@@ -86,7 +86,7 @@
           inherit src;
 
           nativeBuildInputs = with pkgs; [
-            nodejs_23
+            nodejs
             makeWrapper
           ];
 
@@ -139,7 +139,7 @@
           title = builtins.fromJSON ''"\u0050\u0068\u006f\u0074\u006f\u0070\u0065\u0061"'';
           description = builtins.fromJSON ''"\u0052\u0061\u0073\u0074\u0065\u0072\u0020\u0067\u0072\u0061\u0070\u0068\u0069\u0063\u0073\u0020\u0065\u0064\u0069\u0074\u006f\u0072"'';
           inherit system;
-          version = "0.0.4";
+          version = "0.0.5";
         };
         vbean = mkBeans {
           name = "vbean";
@@ -147,7 +147,7 @@
           title = builtins.fromJSON ''"\u0056\u0065\u0063\u0074\u006f\u0072\u0070\u0065\u0061"'';
           description = builtins.fromJSON ''"\u0056\u0065\u0063\u0074\u006f\u0072\u0020\u0067\u0072\u0061\u0070\u0068\u0069\u0063\u0073\u0020\u0065\u0064\u0069\u0074\u006f\u0072"'';
           inherit system;
-          version = "0.0.4";
+          version = "0.0.5";
         };
       });
     };

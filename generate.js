@@ -40,7 +40,7 @@ const generate = () => {
           inject_js_start: "./page.js",
           "chromium-args":
             "--ozone-platform-hint=auto --enable-wayland-ime --disable-web-security",
-          version: "0.0.2",
+          version: "0.0.5",
           "node-remote": [atob(target)],
           dom_storage_quota: 4095,
           window: {
