@@ -1,5 +1,6 @@
 const http = require("http");
 const path = require("path");
+const fs = require("fs");
 
 const __r = (d) => {
   if (typeof d === "string") return atob(d);
@@ -129,6 +130,8 @@ const openHandler = (args) => {
     });
 
     for (const arg of files) {
+      // check if arg is a file
+      if (!fs.existsSync(arg)) continue;
       process.stdout.write("Opening File: ");
       process.stdout.write(arg);
       process.stdout.write("\n");
@@ -159,6 +162,8 @@ const __lf = [];
 try {
   if (nw.App.argv) {
     for (const arg of nw.App.argv) {
+      // check if arg is a file
+      if (!fs.existsSync(arg)) continue;
       process.stdout.write("Opening File: ");
       process.stdout.write(arg);
       process.stdout.write("\n");
