@@ -3,8 +3,6 @@ require = undefined;
 process = undefined;
 
 if (window.location.hostname !== "localhost" && typeof nw !== "undefined") {
-  window.__nwc = nw.global.__nwc;
-  window.__nbf = nw.global.__nbf;
   window.__lf = nw.global.__lf;
   window.__it = nw.global.__it;
   window.__api = nw.global.__api;
@@ -293,4 +291,12 @@ if (window.location.hostname !== "localhost" && typeof nw !== "undefined") {
     }
   };
   __st();
+
+  window.parent = {
+    postMessage: (data) => {
+      if (data == "done") {
+        window.self = window.top;
+      }
+    },
+  };
 }

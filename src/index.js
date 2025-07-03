@@ -18,8 +18,6 @@ YWl1[btoa(`${__r("bQ")}${bQ}`)] = 9007199254740991;
 YWl1[btoa(`${__r("bQ")}${bQ - 1}`)] = 9007199254740991;
 YWl1[btoa(`${__r("bQ")}${bQ + 1}`)] = 9007199254740991;
 
-const clipboard = nw.Clipboard.get();
-
 try {
   nw.global.__style = __r(
     fs.readFileSync(path.join(__dirname, "style.css"), "utf-8")
@@ -66,7 +64,7 @@ const END_POINTS = {
       })
     );
   },
-  "L2V2ZW50LnBocA==": (req, res) => {
+  "L3BhcGkvZXZlbnQucGhw": (req, res) => {
     res.writeHead(200);
     res.end();
   },
@@ -269,13 +267,13 @@ nw.global.recordRecent = (filePath) => {
     recent = [];
   }
 
-  recent = recent.filter((p) => p !== filePath);
+  recent = recent.filter((p) => p.path !== filePath);
 
   if (recent.length >= 50) {
     recent = recent.slice(0, 49);
   }
 
-  recent.unshift(filePath);
+  recent.unshift({ path: filePath, time: Math.floor(Date.now() / 1000) });
 
   nw.global.localStorage.setItem("recentFiles", JSON.stringify(recent));
 };
@@ -299,8 +297,6 @@ try {
   process.stdout.write("\n");
 }
 
-nw.global.__nwc = clipboard;
-nw.global.__nbf = Buffer;
 nw.global.__lf = __lf;
 nw.global.__it = __it;
 
