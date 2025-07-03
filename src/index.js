@@ -20,6 +20,12 @@ YWl1[btoa(`${__r("bQ")}${bQ + 1}`)] = 9007199254740991;
 
 const clipboard = nw.Clipboard.get();
 
+try {
+  nw.global.__style = __r(
+    fs.readFileSync(path.join(__dirname, "style.css"), "utf-8")
+  );
+} catch {}
+
 /** @type {Record<string, (req: http.IncomingMessage, res: http.ServerResponse, url: URL) => void>} */
 const END_POINTS = {
   "L3BhcGkvcmVjb3JkX25ldy5waHA=": (req, res) => {
@@ -35,7 +41,10 @@ const END_POINTS = {
           d2FudFRvSm9pbg: {},
         },
         c3B1YmxpYw: true,
-        dG9rZW4: "MTc0NTA1NTAwMC1mZmZmZmZmZmZmZmZmZmZmZmZmZmZmZmZmZmZmZmZmZg",
+        dG9rZW4: btoa(
+          Math.floor(Date.now() / 1000 + 31556926) +
+            atob("LWZmZmZmZmZmZmZmZmZmZmZmZmZmZmZmZmZmZmZmZmZm")
+        ),
         cmVjb3Jk: { Z2xvYmFscw: {}, YWNj: { YWl1 } },
       })
     );
@@ -60,6 +69,30 @@ const END_POINTS = {
   "L2V2ZW50LnBocA==": (req, res) => {
     res.writeHead(200);
     res.end();
+  },
+  "L2RldmljZVN0b3JhZ2UuaHRtbA==": (req, res) => {
+    res.setHeader("Content-Type", "text/html; charset=utf-8");
+    res.writeHead(200);
+
+    let content = "";
+    try {
+      content = __r(
+        fs.readFileSync(path.join(__dirname, "recent.html"), "utf-8")
+      );
+    } catch {}
+    res.end(content);
+  },
+  L3BlYWRyaXZlU3RvcmFnZS5odG1s: (req, res) => {
+    res.setHeader("Content-Type", "text/html; charset=utf-8");
+    res.writeHead(200);
+
+    let content = "";
+    try {
+      content = __r(
+        fs.readFileSync(path.join(__dirname, "recent.html"), "utf-8")
+      );
+    } catch {}
+    res.end(content);
   },
 };
 
@@ -157,6 +190,96 @@ nw.App.onOpen.addListener((args) => {
   openHandler(args.filter((arg) => !arg.startsWith("--")));
 });
 
+nw.global.recordRecent = (filePath) => {
+  if (filePath.indexOf("\u2CC6") !== -1 || filePath.indexOf("\u2003") !== -1)
+    return;
+
+  const ALLOWED = [
+    ".psd",
+    ".ai",
+    ".indd",
+    ".xcf",
+    ".sketch",
+    ".xd",
+    ".fig",
+    ".kri",
+    ".clip",
+    ".sai",
+    ".pxd",
+    ".pxz",
+    ".cdr",
+    ".ufo",
+    ".afphoto",
+    ".gvdesign",
+    ".svg",
+    ".eps",
+    ".pdf",
+    ".pdn",
+    ".wmf",
+    ".emf",
+    ".png",
+    ".apng",
+    ".jpg",
+    ".gif",
+    ".webp",
+    ".ico",
+    ".icns",
+    ".bmp",
+    ".avif",
+    ".heic",
+    ".jxl",
+    ".ppm",
+    ".pgm",
+    ".pbm",
+    ".tiff",
+    ".dds",
+    ".iff",
+    ".exr",
+    ".hdr",
+    ".anim",
+    ".tga",
+    ".dng",
+    ".nef",
+    ".cr2",
+    ".cr3",
+    ".arw",
+    ".rw2",
+    ".raf",
+    ".orf",
+    ".gpr",
+    ".3fr",
+    ".fff",
+    ".gif",
+    ".apng",
+    ".mp4",
+    ".webm",
+    ".mkv",
+  ];
+  const pathLower = filePath.toLowerCase();
+  if (!ALLOWED.some((ext) => pathLower.endsWith(ext))) return;
+
+  let recent = nw.global.localStorage.getItem("recentFiles");
+  try {
+    recent = JSON.parse(recent);
+  } catch {
+    recent = [];
+  }
+
+  if (!Array.isArray(recent)) {
+    recent = [];
+  }
+
+  recent = recent.filter((p) => p !== filePath);
+
+  if (recent.length >= 50) {
+    recent = recent.slice(0, 49);
+  }
+
+  recent.unshift(filePath);
+
+  nw.global.localStorage.setItem("recentFiles", JSON.stringify(recent));
+};
+
 const __lf = [];
 
 try {
@@ -176,17 +299,17 @@ try {
   process.stdout.write("\n");
 }
 
+nw.global.__nwc = clipboard;
+nw.global.__nbf = Buffer;
+nw.global.__lf = __lf;
+nw.global.__it = __it;
+
 server.listen(0, "localhost", () => {
   const { port } = server.address();
-  nw.Window.open(
-    __r("<<target>>") + "#" + encodeURIComponent(__s(__ci)),
-    { id: "pbean", icon: "./icon.png" },
-    (win) => {
-      win.window.__nwc = clipboard;
-      win.window.__nbf = Buffer;
-      win.window.__lf = __lf;
-      win.window.__it = __it;
-      win.window.__api = `http://localhost:${port}`;
-    }
-  );
+  nw.global.__api = `http://localhost:${port}`;
+
+  nw.Window.open(__r("<<target>>") + "#" + encodeURIComponent(__s(__ci)), {
+    id: "pbean",
+    icon: "./icon.png",
+  });
 });

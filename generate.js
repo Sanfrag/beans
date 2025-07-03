@@ -47,7 +47,7 @@ const generate = () => {
           "chromium-args":
             "--ozone-platform-hint=auto --enable-wayland-ime --disable-web-security --enable-logging",
           version: "0.0.5",
-          "node-remote": [atob(target)],
+          "node-remote": [atob(target), "http://localhost"],
           dom_storage_quota: 4095,
           window: {
             icon: "./icon.png",
@@ -59,6 +59,14 @@ const generate = () => {
     );
     fs.copyFileSync(`${dirname}/src/page.js`, `${dirname}/out/${name}/page.js`);
     fs.copyFileSync(`${dirname}/${icon}`, `${dirname}/out/${name}/icon.png`);
+    fs.copyFileSync(
+      `${dirname}/src/recent.html`,
+      `${dirname}/out/${name}/recent.html`
+    );
+    fs.copyFileSync(
+      `${dirname}/src/style.css`,
+      `${dirname}/out/${name}/style.css`
+    );
   }
 };
 
