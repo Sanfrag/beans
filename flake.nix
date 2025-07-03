@@ -18,6 +18,8 @@
           system = package.system;
           description = package.description;
           version = package.version;
+          type = package.type;
+          dev = package.dev;
 
           src = ./.;
 
@@ -91,7 +93,7 @@
           ];
 
           buildInputs = with pkgs; [
-            nwjs
+            (if dev then nwjs-sdk else nwjs)
           ];
 
           phases = [
@@ -103,7 +105,7 @@
             runHook preBuild
             cp -r ${src}/* .
             mkdir -p out/${name}
-            node generate.js
+            node generate.js ${name}
             runHook postBuild
           '';
 
@@ -117,12 +119,12 @@
             --replace-fail "${name}" "${pname}"
 
             for size in 16 32 64 128 256; do
-              install -Dm644 icons/"$size"/${name}.png \
+              install -Dm644 icons/"$size"/${type}.png \
               $out/share/icons/hicolor/"$size"x"$size"/apps/${pname}.png
             done
 
             install -Dm644 ${desktopItem}/share/applications/${pname}.desktop -t $out/share/applications
-            makeWrapper ${pkgs.nwjs}/bin/nw $out/bin/${pname} --add-flags $out/pkgs/${name}
+            makeWrapper ${if dev then pkgs.nwjs-sdk else pkgs.nwjs}/bin/nw $out/bin/${pname} --add-flags $out/pkgs/${name}
 
             runHook postInstall
           '';
@@ -135,19 +137,43 @@
       packages = forAllSystems (system: {
         pbean = mkBeans {
           name = "pbean";
+          type = "pbean";
           pname = builtins.fromJSON ''"\u0070\u0068\u006f\u0074\u006f\u0070\u0065\u0061"'';
           title = builtins.fromJSON ''"\u0050\u0068\u006f\u0074\u006f\u0070\u0065\u0061"'';
           description = builtins.fromJSON ''"\u0052\u0061\u0073\u0074\u0065\u0072\u0020\u0067\u0072\u0061\u0070\u0068\u0069\u0063\u0073\u0020\u0065\u0064\u0069\u0074\u006f\u0072"'';
           inherit system;
-          version = "0.0.5";
+          version = "0.0.6";
+          dev = false;
         };
         vbean = mkBeans {
           name = "vbean";
+          type = "vbean";
           pname = builtins.fromJSON ''"\u0076\u0065\u0063\u0074\u006f\u0072\u0070\u0065\u0061"'';
           title = builtins.fromJSON ''"\u0056\u0065\u0063\u0074\u006f\u0072\u0070\u0065\u0061"'';
           description = builtins.fromJSON ''"\u0056\u0065\u0063\u0074\u006f\u0072\u0020\u0067\u0072\u0061\u0070\u0068\u0069\u0063\u0073\u0020\u0065\u0064\u0069\u0074\u006f\u0072"'';
           inherit system;
-          version = "0.0.5";
+          version = "0.0.6";
+          dev = false;
+        };
+        pbean-dev = mkBeans {
+          name = "pbean-dev";
+          type = "pbean";
+          pname = builtins.fromJSON ''"\u0070\u0068\u006f\u0074\u006f\u0070\u0065\u0061-dev"'';
+          title = builtins.fromJSON ''"\u0050\u0068\u006f\u0074\u006f\u0070\u0065\u0061 Dev"'';
+          description = builtins.fromJSON ''"\u0052\u0061\u0073\u0074\u0065\u0072\u0020\u0067\u0072\u0061\u0070\u0068\u0069\u0063\u0073\u0020\u0065\u0064\u0069\u0074\u006f\u0072"'';
+          inherit system;
+          version = "0.0.6";
+          dev = true;
+        };
+        vbean-dev = mkBeans {
+          name = "vbean-dev";
+          type = "vbean";
+          pname = builtins.fromJSON ''"\u0076\u0065\u0063\u0074\u006f\u0072\u0070\u0065\u0061-dev"'';
+          title = builtins.fromJSON ''"\u0056\u0065\u0063\u0074\u006f\u0072\u0070\u0065\u0061 Dev"'';
+          description = builtins.fromJSON ''"\u0056\u0065\u0063\u0074\u006f\u0072\u0020\u0067\u0072\u0061\u0070\u0068\u0069\u0063\u0073\u0020\u0065\u0064\u0069\u0074\u006f\u0072"'';
+          inherit system;
+          version = "0.0.6";
+          dev = true;
         };
       });
     };

@@ -18,17 +18,23 @@ const VARIANTS = [
 const dirname = import.meta.dirname;
 
 const generate = () => {
+  const type = process.argv[2];
+  if (type) console.log(`Generating ${type}...`);
+
   for (const variant of VARIANTS) {
+    if (type && !type.includes(variant.name)) continue;
+
     const target = variant.target;
     const icon = variant.icon;
-    const name = variant.name;
+    const name = type || variant.name;
     fs.rmSync(`${dirname}/out/${name}`, { recursive: true, force: true });
     fs.mkdirSync(`${dirname}/out/${name}`, { recursive: true });
 
     const file = fs.readFileSync(`${dirname}/src/index.js`, "utf-8");
     const newFile = file
-      .replace("<<target>>", `${target}`)
-      .replace("<<ci>>", `${variant.ci}`);
+      .replace(/<<target>>/g, `${target}`)
+      .replace(/<<ci>>/g, `${variant.ci}`)
+      .replace(/<<name>>/g, `${name}`);
     fs.writeFileSync(`${dirname}/out/${name}/index.js`, newFile);
     fs.writeFileSync(
       `${dirname}/out/${name}/package.json`,
@@ -39,7 +45,7 @@ const generate = () => {
           product_string: name,
           inject_js_start: "./page.js",
           "chromium-args":
-            "--ozone-platform-hint=auto --enable-wayland-ime --disable-web-security",
+            "--ozone-platform-hint=auto --enable-wayland-ime --disable-web-security --enable-logging",
           version: "0.0.5",
           "node-remote": [atob(target)],
           dom_storage_quota: 4095,
