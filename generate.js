@@ -21,6 +21,16 @@ const generate = () => {
   const type = process.argv[2];
   if (type) console.log(`Generating ${type}...`);
 
+  const version = fs
+    .readFileSync(`./flake.nix`, "utf-8")
+    .match(/version = "(.*)"/)[1];
+
+  if (!version) {
+    throw new Error("Could not find version!");
+  }
+
+  console.log(`Version: ${version}`);
+
   for (const variant of VARIANTS) {
     if (type && !type.includes(variant.name)) continue;
 
@@ -46,7 +56,7 @@ const generate = () => {
           inject_js_start: "./page.js",
           "chromium-args":
             "--ozone-platform-hint=auto --enable-wayland-ime --disable-web-security --enable-logging",
-          version: "0.0.7",
+          version: version,
           "node-remote": [atob(target), "http://localhost"],
           dom_storage_quota: 4095,
           window: {

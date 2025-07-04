@@ -10,6 +10,14 @@ const __r = (d) => {
   for (const k in d) o[__r(k)] = __r(d[k]);
   return o;
 };
+const __e = (d) => {
+  if (typeof d === "string") return btoa(d);
+  if (typeof d !== "object") return d;
+  if (d instanceof Array) return d.map((e) => __e(e));
+  const o = {};
+  for (const k in d) o[__e(k)] = __e(d[k]);
+  return o;
+};
 const __s = (d) => JSON.stringify(__r(d));
 
 const bQ = Math.floor(Date.now() / ((365.25 * 24 * 60 * 6e4) / 12));
@@ -24,30 +32,83 @@ try {
   );
 } catch {}
 
+const readFormUrlencoded = async (req) => {
+  return new Promise((resolve) => {
+    let body = "";
+    req.on("data", (chunk) => {
+      body += chunk.toString();
+    });
+    req.on("end", () => {
+      const params = new URLSearchParams(body);
+      const result = {};
+      for (const [key, value] of params) {
+        result[key] = value;
+      }
+      resolve(result);
+    });
+  });
+};
+
 /** @type {Record<string, (req: http.IncomingMessage, res: http.ServerResponse, url: URL) => void>} */
 const END_POINTS = {
-  "L3BhcGkvcmVjb3JkX25ldy5waHA=": (req, res) => {
+  "L3BhcGkvcmVjb3JkX25ldy5waHA=": async (req, res) => {
+    const body = await readFormUrlencoded(req);
+
     res.writeHead(200);
-    res.end(
-      __s({
-        dXNlcg: {
-          aWQ: 1,
-          bmFtZQ: "UmVkYWN0IEVk",
-          ZW1haWw: "cmVkYWN0QGVkLm5hbWU",
-          cG1udHM: [[8640000000000, 100000000, 1, 0, "SU5WQUxJRA"]],
-          aW5UZWFtcw: [],
-          d2FudFRvSm9pbg: {},
-        },
-        c3B1YmxpYw: true,
-        dG9rZW4: btoa(
-          Math.floor(Date.now() / 1000 + 31556926) +
-            atob("LWZmZmZmZmZmZmZmZmZmZmZmZmZmZmZmZmZmZmZmZmZm")
-        ),
-        cmVjb3Jk: { Z2xvYmFscw: {}, YWNj: { YWl1 } },
-      })
-    );
+    if (+body[__r("cmVhZA")]) {
+      let savedata = nw.global.localStorage.getItem("__savedata") || "{}";
+      try {
+        savedata = JSON.parse(savedata);
+      } catch {
+        savedata = {};
+      }
+
+      res.end(
+        __s({
+          dXNlcg: {
+            aWQ: 1,
+            bmFtZQ: "UmVkYWN0IEVk",
+            ZW1haWw: "cmVkYWN0QGVkLm5hbWU",
+            cG1udHM: [[8640000000000, 100000000, 1, 0, "SU5WQUxJRA"]],
+            aW5UZWFtcw: [],
+            d2FudFRvSm9pbg: {},
+          },
+          c3B1YmxpYw: true,
+          dG9rZW4: btoa(
+            Math.floor(Date.now() / 1000 + 31556926) +
+              atob("LWZmZmZmZmZmZmZmZmZmZmZmZmZmZmZmZmZmZmZmZmZm")
+          ),
+          cmVjb3Jk: {
+            Z2xvYmFscw: __e(savedata),
+            YWNj: { YWl1 },
+          },
+        })
+      );
+    } else {
+      // save global
+      const record = body[__r("cmVjb3Jk")];
+      if (record) {
+        try {
+          const data = JSON.parse(record);
+          if (data[__r("Z2xvYmFscw")]) {
+            nw.global.localStorage.setItem(
+              "__savedata",
+              JSON.stringify(data[__r("Z2xvYmFscw")])
+            );
+          }
+        } catch {}
+      }
+      res.end(
+        __s({
+          dG9rZW4: btoa(
+            Math.floor(Date.now() / 1000 + 31556926) +
+              atob("LWZmZmZmZmZmZmZmZmZmZmZmZmZmZmZmZmZmZmZmZmZm")
+          ),
+        })
+      );
+    }
   },
-  L3BhcGkvbG9naW4ucGhw: (req, res) => {
+  L3BhcGkvbG9naW4ucGhw: async (req, res) => {
     res.setHeader("Content-Type", "text/html; charset=utf-8");
     res.writeHead(200);
     res.end(
@@ -56,7 +117,7 @@ const END_POINTS = {
       )
     );
   },
-  L3BhcGkvZG9tcy5qc29u: (req, res) => {
+  L3BhcGkvZG9tcy5qc29u: async (req, res) => {
     res.writeHead(200);
     res.end(
       __s({
@@ -64,7 +125,7 @@ const END_POINTS = {
       })
     );
   },
-  "L3BhcGkvZXZlbnQucGhw": (req, res) => {
+  L3BhcGkvZXZlbnQucGhw: async (req, res) => {
     res.writeHead(200);
     res.end();
   },
@@ -80,7 +141,7 @@ const END_POINTS = {
     } catch {}
     res.end(content);
   },
-  L3BlYWRyaXZlU3RvcmFnZS5odG1s: (req, res) => {
+  L3BlYWRyaXZlU3RvcmFnZS5odG1s: async (req, res) => {
     res.setHeader("Content-Type", "text/html; charset=utf-8");
     res.writeHead(200);
 
@@ -94,7 +155,7 @@ const END_POINTS = {
   },
 };
 
-const server = http.createServer((req, res) => {
+const server = http.createServer(async (req, res) => {
   res.setHeader("Access-Control-Allow-Origin", "*");
   res.setHeader(
     "Access-Control-Allow-Methods",
@@ -104,7 +165,7 @@ const server = http.createServer((req, res) => {
 
   const url = new URL(`http://internal${req.url}`);
   const handler = END_POINTS[btoa(url.pathname)];
-  if (handler) {
+  if (await handler) {
     handler(req, res, url);
     return;
   }
