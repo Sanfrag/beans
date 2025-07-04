@@ -149,9 +149,12 @@ if (window.location.hostname !== "localhost" && typeof nw !== "undefined") {
           return;
         }
 
-        nw.global.recordRecent(input.files[0].path);
-        const fakeFileHandle = createFakeHandle(input.files[0]);
-        resolve([fakeFileHandle]);
+        const handles = [];
+        for (const file of input.files) {
+          nw.global.recordRecent(file.path);
+          handles.push(createFakeHandle(file));
+        }
+        resolve(handles);
       });
     });
   };

@@ -95,6 +95,8 @@
 
           buildInputs = with pkgs; [
             (if dev then nwjs-sdk else nwjs)
+            ffmpeg
+            imagemagick
           ];
 
           phases = [
@@ -125,7 +127,10 @@
             done
 
             install -Dm644 ${desktopItem}/share/applications/${pname}.desktop -t $out/share/applications
-            makeWrapper ${if dev then pkgs.nwjs-sdk else pkgs.nwjs}/bin/nw $out/bin/${pname} --add-flags $out/pkgs/${name}
+            makeWrapper ${if dev then pkgs.nwjs-sdk else pkgs.nwjs}/bin/nw $out/bin/${pname} \
+              --add-flags $out/pkgs/${name} \
+              --set BEANS_FFMPEG ${pkgs.ffmpeg}/bin/ffmpeg \
+              --set BEANS_MAGICK ${pkgs.imagemagick}/bin/magick
 
             runHook postInstall
           '';

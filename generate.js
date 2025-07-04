@@ -55,13 +55,19 @@ const generate = () => {
           product_string: name,
           inject_js_start: "./page.js",
           "chromium-args":
-            "--ozone-platform-hint=auto --enable-wayland-ime --disable-web-security --enable-logging",
+            "--ozone-platform-hint=auto --enable-wayland-ime --disable-web-security --allow-running-insecure-content --enable-logging",
           version: version,
-          "node-remote": [atob(target), "http://localhost"],
+          "node-remote": [
+            atob(target),
+            "http://localhost",
+            "https://sanfrag.local",
+          ],
           dom_storage_quota: 4095,
           window: {
             icon: "./icon.png",
           },
+          permissions: ["declarativeNetRequest"],
+          host_permissions: ["http://sanfrag.local/*"],
         },
         null,
         2
