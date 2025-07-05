@@ -963,7 +963,7 @@ nw.global.recordRecent = (filePath) => {
   }
 
   recent.unshift({ path: filePath, time: Math.floor(Date.now() / 1000) });
-
+  nw.global.localStorage.setItem("__dialogPath", path.dirname(filePath));
   nw.global.localStorage.setItem("recentFiles", JSON.stringify(recent));
 };
 

@@ -108,6 +108,8 @@ if (window.location.hostname !== "localhost" && typeof nw !== "undefined") {
   window.showSaveFilePicker = async function (options) {
     const input = document.createElement("input");
     input.type = "file";
+    input.nwworkingdir =
+      nw.global.localStorage.getItem("__dialogPath") || undefined;
     input.nwsaveas = path.basename(decodeRecentFilename(options.suggestedName));
     input.accept = options.types
       .flatMap((t) => Object.values(t.accept).flat())
@@ -135,6 +137,8 @@ if (window.location.hostname !== "localhost" && typeof nw !== "undefined") {
   window.showOpenFilePicker = async function (options) {
     const input = document.createElement("input");
     input.type = "file";
+    input.nwworkingdir =
+      nw.global.localStorage.getItem("__dialogPath") || undefined;
     input.multiple = options.multiple;
     input.click();
 
