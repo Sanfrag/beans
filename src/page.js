@@ -40,7 +40,7 @@ if (window.location.hostname !== "localhost" && typeof nw !== "undefined") {
     }
   );
 
-  document.__defineGetter__("referrer", () => "https://sanfrag.com");
+  document.__defineGetter__("referrer", () => "https://sanfrag.local");
 
   const Navigator_Permissions_Query = navigator.permissions.query;
   navigator.permissions.query = async function (args) {
@@ -299,6 +299,7 @@ if (window.location.hostname !== "localhost" && typeof nw !== "undefined") {
     postMessage: (data) => {
       if (data == "done") {
         window.self = window.top;
+        window.parent = window;
       }
     },
   };
