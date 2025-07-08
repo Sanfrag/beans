@@ -34,6 +34,25 @@ try {
   );
 } catch {}
 
+const STOR_FILE = path.join(nw.App.dataPath, "Store.json");
+let __stor = {};
+try {
+  if (fs.existsSync(STOR_FILE)) {
+    __stor = JSON.parse(fs.readFileSync(STOR_FILE, "utf-8"));
+  }
+} catch {}
+
+const __storI = {
+  getItem: (k) => __stor[k],
+  setItem: (k, v) => {
+    __stor[k] = v.toString();
+    fs.writeFileSync(STOR_FILE, JSON.stringify(__stor));
+  },
+};
+
+nw.global.__stor = __storI;
+nw.global.__defineGetter__("localStorage", () => nw.global.__stor);
+
 const readFormUrlencoded = async (req) => {
   return new Promise((resolve) => {
     let body = "";

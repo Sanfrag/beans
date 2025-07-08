@@ -7,6 +7,7 @@ if (window.location.hostname !== "localhost" && typeof nw !== "undefined") {
   window.__it = nw.global.__it;
   window.__api = nw.global.__api;
 
+  window.__defineGetter__("localStorage", () => nw.global.__stor);
   navigator.__defineGetter__("onLine", () => true);
 
   function decodeRecentFilename(filename) {
