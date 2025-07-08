@@ -2,6 +2,10 @@
 require = undefined;
 process = undefined;
 
+window.addEventListener("contextmenu", (e) => {
+  e.preventDefault();
+});
+
 if (window.location.hostname !== "localhost" && typeof nw !== "undefined") {
   window.__lf = nw.global.__lf;
   window.__it = nw.global.__it;
