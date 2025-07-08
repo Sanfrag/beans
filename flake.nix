@@ -9,7 +9,7 @@
       nixpkgs,
     }:
     let
-      version = "0.1.3";
+      version = "0.1.4";
       mkBeans =
         package:
         let

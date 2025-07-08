@@ -48,6 +48,10 @@ const __storI = {
     __stor[k] = v.toString();
     fs.writeFileSync(STOR_FILE, JSON.stringify(__stor));
   },
+  removeItem: (k) => {
+    delete __stor[k];
+    fs.writeFileSync(STOR_FILE, JSON.stringify(__stor));
+  },
 };
 
 nw.global.__stor = __storI;
@@ -825,6 +829,9 @@ const server = http.createServer(async (req, res) => {
 const __ci = {
   ZW52aXJvbm1lbnQ: {
     bWVudXM: JSON.parse(atob("<<ci>>")),
+  },
+  YXBpcw: {
+    ZGV6Z28: null,
   },
 };
 
