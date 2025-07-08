@@ -300,12 +300,20 @@ if (window.location.hostname !== "localhost" && typeof nw !== "undefined") {
   };
   __st();
 
-  window.parent = {
-    postMessage: (data) => {
-      if (data == "done") {
-        window.self = window.top;
-        window.parent = window;
-      }
-    },
-  };
+  window.__defineGetter__("parent", function s() {
+    if (
+      s.caller &&
+      s.caller.toString().indexOf("window.parent.postMessage") != -1
+    ) {
+      return {
+        postMessage: (data) => {
+          if (data == "done") {
+            window.self = window.top;
+          }
+        },
+      };
+    } else {
+      return window;
+    }
+  });
 }

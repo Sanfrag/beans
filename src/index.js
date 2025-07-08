@@ -7,6 +7,8 @@ const { spawn } = require("child_process");
 const __r = (d) => {
   if (typeof d === "string") return atob(d);
   if (typeof d !== "object") return d;
+  if (typeof d === "undefined") return undefined;
+  if (d === null) return null;
   if (d instanceof Array) return d.map((e) => __r(e));
   const o = {};
   for (const k in d) o[__r(k)] = __r(d[k]);
@@ -15,6 +17,8 @@ const __r = (d) => {
 const __e = (d) => {
   if (typeof d === "string") return btoa(d);
   if (typeof d !== "object") return d;
+  if (typeof d === "undefined") return undefined;
+  if (d === null) return null;
   if (d instanceof Array) return d.map((e) => __e(e));
   const o = {};
   for (const k in d) o[__e(k)] = __e(d[k]);
@@ -830,9 +834,9 @@ const __ci = {
   ZW52aXJvbm1lbnQ: {
     bWVudXM: JSON.parse(atob("<<ci>>")),
   },
-  YXBpcw: {
-    ZGV6Z28: null,
-  },
+  // YXBpcw: {
+  //   ZGV6Z28: null,
+  // },
 };
 
 const __it = {};
