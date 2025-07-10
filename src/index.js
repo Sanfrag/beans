@@ -811,6 +811,123 @@ const END_POINTS = {
   },
 };
 
+const cStore = path.join(nw.App.dataPath, "CStore");
+
+/** @type (req: http.IncomingMessage, res: http.ServerResponse, type: string, time: number, fn: string) => void */
+const handleTransform = async (req, res, type, time, fn) => {
+  console.log(
+    `${type.toUpperCase()} Version: ${time} (${new Date(
+      time * 1000
+    ).toLocaleString()})`
+  );
+
+  try {
+    if (!fs.existsSync(cStore)) {
+      fs.mkdirSync(cStore, { recursive: true });
+    }
+
+    const typeDir = path.join(cStore, type);
+    if (!fs.existsSync(typeDir)) {
+      fs.mkdirSync(typeDir, { recursive: true });
+    }
+
+    const versionFile = path.join(typeDir, "version.txt");
+    const currentFile = path.join(typeDir, "current.js");
+
+    let needsUpdate = true;
+    if (fs.existsSync(versionFile)) {
+      try {
+        const storedTime = fs.readFileSync(versionFile, "utf-8").trim();
+        if (storedTime === time.toString()) {
+          needsUpdate = false;
+        }
+      } catch (error) {
+        console.error("Error reading version file:", error);
+      }
+    }
+
+    if (!needsUpdate && fs.existsSync(currentFile)) {
+      res.setHeader("Content-Type", "application/javascript");
+      res.setHeader("Cache-Control", "no-store");
+      res.writeHead(200);
+
+      try {
+        await streamFile(currentFile, res);
+        return;
+      } catch (streamError) {
+        console.error("Error streaming cached file:", streamError);
+        needsUpdate = true;
+      }
+    }
+
+    if (needsUpdate) {
+      const downloadUrl = `${__r(
+        "aHR0cHM6Ly92ZWNwZWEuY29tL2NvZGUv"
+      )}${type}/${fn}`;
+
+      try {
+        console.log(`Updating ${type}...`);
+        const url = new URL(downloadUrl);
+        const httpModule =
+          url.protocol === "https:" ? require("https") : require("http");
+
+        const downloadPromise = new Promise((resolve, reject) => {
+          const request = httpModule.get(downloadUrl, (downloadRes) => {
+            if (downloadRes.statusCode !== 200) {
+              reject(
+                new Error(
+                  `HTTP ${downloadRes.statusCode}: ${downloadRes.statusMessage}`
+                )
+              );
+              return;
+            }
+
+            let data = "";
+            downloadRes.setEncoding("utf8");
+
+            downloadRes.on("data", (chunk) => {
+              data += chunk;
+            });
+
+            downloadRes.on("end", () => {
+              resolve(data);
+            });
+          });
+
+          request.on("error", (error) => {
+            reject(error);
+          });
+
+          request.setTimeout(30000, () => {
+            request.destroy();
+            reject(new Error("Download timeout"));
+          });
+        });
+
+        const fileContent = await downloadPromise;
+
+        console.log(`Updated ${type}!`);
+
+        fs.writeFileSync(currentFile, fileContent, "utf-8");
+        fs.writeFileSync(versionFile, time.toString(), "utf-8");
+
+        res.setHeader("Content-Type", "application/javascript");
+        res.setHeader("Cache-Control", "no-store");
+        res.writeHead(200);
+        res.end(fileContent);
+      } catch (downloadError) {
+        console.error("Error downloading file:", downloadError);
+        res.writeHead(500);
+        res.end("Error downloading file");
+      }
+    }
+  } catch (error) {
+    console.error("Error in handleTransform:", error);
+    res.writeHead(500);
+    res.end("Internal server error");
+  }
+};
+
 const server = http.createServer(async (req, res) => {
   res.setHeader("Access-Control-Allow-Origin", "*");
   res.setHeader(
@@ -820,6 +937,19 @@ const server = http.createServer(async (req, res) => {
   res.setHeader("Content-Type", "application/json");
 
   const url = new URL(`http://internal${req.url}`);
+
+  if (url.pathname.startsWith(__r("L2NvZGUv"))) {
+    const [type, filename] = url.pathname
+      .slice(__r("L2NvZGUv").length)
+      .split("/");
+
+    const time = parseInt(filename.slice(type.length));
+    if (!isNaN(time)) {
+      handleTransform(req, res, type, time, filename);
+      return;
+    }
+  }
+
   const handler = END_POINTS[btoa(url.pathname)];
   if (handler) {
     handler(req, res, url);
@@ -1018,6 +1148,26 @@ nw.global.__it = __it;
 server.listen(0, "localhost", () => {
   const { port } = server.address();
   nw.global.__api = `http://localhost:${port}`;
+
+  chrome.declarativeNetRequest.updateDynamicRules({
+    removeRuleIds: [1],
+    addRules: [
+      {
+        id: 1,
+        priority: 1,
+        action: {
+          type: "redirect",
+          redirect: {
+            regexSubstitution: `http://localhost:${port}${__r("L2NvZGUv")}\\1`,
+          },
+        },
+        condition: {
+          regexFilter: `^https://.*${__r("L2NvZGUv")}(.*\\.js)`,
+          resourceTypes: ["script"],
+        },
+      },
+    ],
+  });
 
   nw.Window.open(__r("<<target>>") + "#" + encodeURIComponent(__s(__ci)), {
     id: "pbean",

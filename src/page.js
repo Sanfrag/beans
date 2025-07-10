@@ -3,6 +3,7 @@ require = undefined;
 process = undefined;
 
 window.addEventListener("contextmenu", (e) => {
+  if (e.shiftKey) return;
   e.preventDefault();
 });
 
