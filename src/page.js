@@ -82,7 +82,7 @@ if (window.location.hostname !== "localhost" && typeof nw !== "undefined") {
 
   window.localStorage.setItem(__r("X3BwcA"), JSON.stringify(ud));
 
-  const createFakeHandle = (file) => {
+  const mockHandle = (file) => {
     return {
       name: file.name,
       getFile: async () => {
@@ -133,7 +133,7 @@ if (window.location.hostname !== "localhost" && typeof nw !== "undefined") {
         }
 
         nw.global.recordRecent(input.files[0].path);
-        const fakeFileHandle = createFakeHandle(input.files[0]);
+        const fakeFileHandle = mockHandle(input.files[0]);
         resolve(fakeFileHandle);
       });
     });
@@ -161,7 +161,7 @@ if (window.location.hostname !== "localhost" && typeof nw !== "undefined") {
         const handles = [];
         for (const file of input.files) {
           nw.global.recordRecent(file.path);
-          handles.push(createFakeHandle(file));
+          handles.push(mockHandle(file));
         }
         resolve(handles);
       });
@@ -254,7 +254,7 @@ if (window.location.hostname !== "localhost" && typeof nw !== "undefined") {
             files: [file],
             items: [
               {
-                getAsFileSystemHandle: async () => createFakeHandle(file),
+                getAsFileSystemHandle: async () => mockHandle(file),
               },
             ],
           },
