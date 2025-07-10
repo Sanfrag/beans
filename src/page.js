@@ -117,7 +117,8 @@ if (window.location.hostname !== "localhost" && typeof nw !== "undefined") {
       nw.global.localStorage.getItem("__dialogPath") || undefined;
     input.nwsaveas = path.basename(decodeRecentFilename(options.suggestedName));
     input.accept = options.types
-      .flatMap((t) => Object.values(t.accept).flat())
+      .flatMap((t) => t && t.accept && Object.values(t.accept).flat())
+      .filter(Boolean)
       .join(",");
     input.click();
 
@@ -304,8 +305,10 @@ if (window.location.hostname !== "localhost" && typeof nw !== "undefined") {
   };
   __st();
 
+  let __d = false;
   window.__defineGetter__("parent", function s() {
     if (
+      !__d &&
       s.caller &&
       s.caller.toString().indexOf("window.parent.postMessage") != -1
     ) {
@@ -313,6 +316,7 @@ if (window.location.hostname !== "localhost" && typeof nw !== "undefined") {
         postMessage: (data) => {
           if (data == "done") {
             window.self = window.top;
+            __d = true;
           }
         },
       };
