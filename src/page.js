@@ -306,6 +306,7 @@ if (window.location.hostname !== "localhost" && typeof nw !== "undefined") {
   __st();
 
   let __d = false;
+  nw.global.__suppressAlt = false;
   window.__defineGetter__("parent", function s() {
     if (
       !__d &&
@@ -317,6 +318,15 @@ if (window.location.hostname !== "localhost" && typeof nw !== "undefined") {
           if (data == "done") {
             window.self = window.top;
             __d = true;
+
+            const alt = window.alert;
+            window.alert = function (message, options) {
+              if (nw.global.__suppressAlt) {
+                nw.global.__suppressAlt = false;
+                return;
+              }
+              return alt.call(this, message, options);
+            };
           }
         },
       };
@@ -324,4 +334,47 @@ if (window.location.hostname !== "localhost" && typeof nw !== "undefined") {
       return window;
     }
   });
+
+  const __cgc = HTMLIFrameElement.prototype.__lookupGetter__("contentWindow");
+  HTMLIFrameElement.prototype.__defineGetter__("contentWindow", function __s() {
+    const w = __cgc.call(this);
+
+    try {
+      const url = new URL(this.src);
+      if (url.hostname != "localhost") return w;
+    } catch {}
+
+    try {
+      if (__s.caller?.caller.toString().indexOf(__r("T3BlbmluZyAuLi4")) != -1) {
+        return new Proxy(w, {
+          get: (target, prop) => {
+            if (prop === "postMessage") {
+              return (data, origin) => {
+                if (typeof data === "string") {
+                  try {
+                    const parsed = JSON.parse(data);
+                    if (parsed.code == "load") {
+                      parsed.code = "__open";
+                    }
+                    data = JSON.stringify(parsed);
+                  } catch {}
+                }
+                window.postMessage.call(w, data, origin);
+              };
+            }
+            return target[prop];
+          },
+        });
+      }
+    } catch {}
+
+    return w;
+  });
+
+  const __wce = HTMLCanvasElement.prototype.getContext;
+  HTMLCanvasElement.prototype.getContext = function __ll(type, options) {
+    const opt = options || {};
+    opt.willReadFrequently = true;
+    return __wce.call(this, type, opt);
+  };
 }
