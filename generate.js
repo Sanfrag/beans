@@ -53,7 +53,7 @@ const generate = () => {
           main: "./index.js",
           name: name,
           product_string: name,
-          inject_js_start: "./page.js",
+          inject_js_end: "./page.js",
           "chromium-args":
             "--ozone-platform-hint=auto --enable-wayland-ime --disable-web-security --allow-running-insecure-content --enable-logging",
           version: version,
