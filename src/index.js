@@ -41,9 +41,7 @@ try {
 const STOR_FILE = path.join(nw.App.dataPath, "Store.json");
 let __stor = {};
 try {
-  if (fs.existsSync(STOR_FILE)) {
-    __stor = JSON.parse(fs.readFileSync(STOR_FILE, "utf-8"));
-  }
+  __stor = JSON.parse(fs.readFileSync(STOR_FILE, "utf-8"));
 } catch {}
 
 const __storI = {
@@ -85,10 +83,8 @@ const CACHE_EXPIRY_DAYS = 7;
 
 const ensureCacheDir = () => {
   try {
-    if (!fs.existsSync(CACHE_DIR)) {
-      fs.mkdirSync(CACHE_DIR, { recursive: true });
-      console.log(`Created cache directory: ${CACHE_DIR}`);
-    }
+    fs.mkdirSync(CACHE_DIR, { recursive: true });
+    console.log(`Created cache directory: ${CACHE_DIR}`);
     return true;
   } catch (error) {
     console.error(`Failed to create cache directory: ${CACHE_DIR}`, error);
