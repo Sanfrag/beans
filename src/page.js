@@ -378,4 +378,6 @@ if (window.location.hostname !== "localhost" && typeof nw !== "undefined") {
     opt.willReadFrequently = true;
     return __wce.call(this, type, opt);
   };
+
+  nw.global.__mr();
 }

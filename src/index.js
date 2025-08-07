@@ -924,7 +924,22 @@ const handleTransform = async (req, res, type, time, fn) => {
   }
 };
 
+const PAGE_CALLBACKS = [];
+let pageReady = false;
+const awaitForPage = async () => {
+  if (pageReady) return Promise.resolve();
+  return new Promise((resolve) => PAGE_CALLBACKS.push(resolve));
+};
+
+const markReady = () => {
+  pageReady = true;
+  PAGE_CALLBACKS.forEach((resolve) => resolve());
+  PAGE_CALLBACKS.length = 0;
+};
+
 const server = http.createServer(async (req, res) => {
+  await awaitForPage();
+
   res.setHeader("Access-Control-Allow-Origin", "*");
   res.setHeader(
     "Access-Control-Allow-Methods",
@@ -1140,6 +1155,7 @@ try {
 
 nw.global.__lf = __lf;
 nw.global.__it = __it;
+nw.global.__mr = markReady;
 
 server.listen(0, "localhost", () => {
   const { port } = server.address();
