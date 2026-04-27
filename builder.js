@@ -20,6 +20,8 @@ nwbuild({
   outDir: `./build/${bean}-${platform}-${arch}`,
   argv: process.argv.slice(5),
   app: {
+    name: bean === 'vbean' ? atob("VmVjdG9ycGVh") : atob("UGhvdG9wZWE"),
+    fileDescription: bean === 'vbean' ? atob("VmVjdG9yIGdyYXBoaWNzIGVkaXRvcg") : atob("UmFzdGVyIGdyYXBoaWNzIGVkaXRvcg"),
     icon: `./icons/512/${bean}.png`,
     LSApplicationCategoryType: "public.app-category.graphics-design",
     NSHumanReadableCopyright: "Public Domain",
