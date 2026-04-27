@@ -1,9 +1,9 @@
 name: Build and Release AppImages
 
 on:
-  workflow_dispatch:
-  release:
-    types: [published]
+  push:
+    tags:
+      - '*'
 
 jobs:
   build:
@@ -39,8 +39,14 @@ jobs:
       - name: List build artifacts
         run: ls -la build/*.AppImage
 
+      - name: Create Release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAG: ${{ github.ref_name }}
+        run: gh release create "$TAG" --title "$TAG" --notes "$TAG"
+
       - name: Upload AppImages
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          gh release upload ${{ github.event.release.tag_name }} build/pbean-*.AppImage build/vbean-*.AppImage --clobber
+          TAG: ${{ github.ref_name }}
+        run: gh release upload "$TAG" build/pbean-*.AppImage build/vbean-*.AppImage --clobber
