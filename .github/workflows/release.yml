@@ -27,6 +27,9 @@ jobs:
       - name: Build Linux binaries
         run: npm run build:linux
 
+      - name: Install FUSE
+        run: sudo apt-get install -y libfuse2t64
+
       - name: Build pbean AppImage
         run: ./appimage.sh pbean
 
