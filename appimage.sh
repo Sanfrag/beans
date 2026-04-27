@@ -64,12 +64,12 @@ sed -i "s/\${APP_NAME}/${APP_NAME}/g" "$APPDIR/AppRun"
 chmod +x "$APPDIR/AppRun"
 
 # Create .desktop file
-cat > "$APPDIR/${APP_NAME}.desktop" << EOF
+cat > "$APPDIR/${DISPLAY_NAME}.desktop" << EOF
 [Desktop Entry]
 Name=${DISPLAY_NAME}
 Comment=${DESCRIPTION}
 Exec=${APP_NAME} %F
-Icon=${APP_NAME}
+Icon=${DISPLAY_NAME}
 Type=Application
 Terminal=false
 Categories=Graphics;
@@ -131,7 +131,7 @@ for size in 16 32 64 128 256 512; do
 done
 
 # Also copy to AppDir root
-cp "icons/512/${BEAN}.png" "$APPDIR/${APP_NAME}.png"
+cp "icons/512/${BEAN}.png" "$APPDIR/${DISPLAY_NAME}.png"
 
 # Build AppImage (NW.js doesn't need GTK, so we skip the plugin and use appimagetool directly)
 echo "Building AppImage..."
@@ -149,8 +149,8 @@ mkdir -p "$APPDIR/usr/bin" "$APPDIR/usr/lib" "$APPDIR/usr/share/applications" "$
 mv "$APPDIR"/*.so* "$APPDIR"/usr/lib/ 2>/dev/null || true
 
 # Copy .desktop and icon to standard locations
-cp "$APPDIR/${APP_NAME}.desktop" "$APPDIR/usr/share/applications/"
-cp "$APPDIR/${APP_NAME}.png" "$APPDIR/usr/share/pixmaps/"
+cp "$APPDIR/${DISPLAY_NAME}.desktop" "$APPDIR/usr/share/applications/"
+cp "$APPDIR/${DISPLAY_NAME}.png" "$APPDIR/usr/share/pixmaps/"
 
 # Build with appimagetool
 ARCH="$ARCH" ./"$APPIMAGETOOL" "$APPDIR" "$OUTPUT"
