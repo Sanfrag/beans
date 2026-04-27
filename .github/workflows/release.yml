@@ -40,21 +40,17 @@ jobs:
         run: ls -la build/*.AppImage
 
       - name: Upload pbean AppImage
-        uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ github.event.release.upload_url }}
-          asset_path: build/pbean-*.AppImage
-          asset_name: pbean.AppImage
-          asset_content_type: application/vnd.appimage
+          ASSET_PATH: build/pbean-$(grep -m1 'version = ' flake.nix | sed 's/.*version = "\([^"]*\)".*/\1/')-linux-x86_64.AppImage
+        run: |
+          echo "Uploading $ASSET_PATH"
+          gh release upload ${{ github.event.release.tag_name }} "$ASSET_PATH" --clobber
 
       - name: Upload vbean AppImage
-        uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ github.event.release.upload_url }}
-          asset_path: build/vbean-*.AppImage
-          asset_name: vbean.AppImage
-          asset_content_type: application/vnd.appimage
+          ASSET_PATH: build/vbean-$(grep -m1 'version = ' flake.nix | sed 's/.*version = "\([^"]*\)".*/\1/')-linux-x86_64.AppImage
+        run: |
+          echo "Uploading $ASSET_PATH"
+          gh release upload ${{ github.event.release.tag_name }} "$ASSET_PATH" --clobber
