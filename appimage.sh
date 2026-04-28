@@ -8,7 +8,6 @@ ARCH="${2:-x86_64}"
 # Configuration
 # Read version from flake.nix
 VERSION=$(grep -m1 'version = ' flake.nix | sed 's/.*version = "\([^"]*\)".*/\1/')
-APP_NAME="${BEAN}"
 ARCH_NAME="${ARCH}"
 # Normalize arch names: x86_64 -> x64, aarch64 -> arm64
 case "$ARCH" in
@@ -46,10 +45,6 @@ mkdir -p "$APPDIR"
 echo "Copying build files..."
 cp -r "$BUILD_DIR"/* "$APPDIR/"
 
-# Rename main executable to match app name (only if different)
-if [ -f "$BUILD_DIR/$BEAN" ] && [ "$BEAN" != "$APP_NAME" ]; then
-    mv "$APPDIR/$BEAN" "$APPDIR/${APP_NAME}"
-fi
 
 # Create AppRun wrapper
 cat > "$APPDIR/AppRun" << 'EOF'
@@ -58,9 +53,9 @@ SELF=$(readlink -f "$0")
 HERE=${SELF%/*}
 export PATH="${HERE}:${PATH}"
 export LD_LIBRARY_PATH="${HERE}/lib:${LD_LIBRARY_PATH}"
-exec "${HERE}/${APP_NAME}" "$@"
+exec "${HERE}/<<BINARY>>" "$@"
 EOF
-sed -i "s/\${APP_NAME}/${APP_NAME}/g" "$APPDIR/AppRun"
+sed -i "s/<<BINARY>>/$DISPLAY_NAME/g" "$APPDIR/AppRun"
 chmod +x "$APPDIR/AppRun"
 
 # Create .desktop file
@@ -68,7 +63,7 @@ cat > "$APPDIR/${DISPLAY_NAME}.desktop" << EOF
 [Desktop Entry]
 Name=${DISPLAY_NAME}
 Comment=${DESCRIPTION}
-Exec=${APP_NAME} %F
+Exec=AppRun %F
 Icon=${DISPLAY_NAME}
 Type=Application
 Terminal=false
@@ -126,7 +121,7 @@ mkdir -p "$APPDIR/usr/share/icons/hicolor"
 for size in 16 32 64 128 256 512; do
     mkdir -p "$APPDIR/usr/share/icons/hicolor/${size}x${size}/apps"
     if [ -f "icons/${size}/${BEAN}.png" ]; then
-        cp "icons/${size}/${BEAN}.png" "$APPDIR/usr/share/icons/hicolor/${size}x${size}/apps/${APP_NAME}.png"
+        cp "icons/${size}/${BEAN}.png" "$APPDIR/usr/share/icons/hicolor/${size}x${size}/apps/${BEAN}.png"
     fi
 done
 
@@ -155,7 +150,7 @@ cp "$APPDIR/${DISPLAY_NAME}.png" "$APPDIR/usr/share/pixmaps/"
 # Build with appimagetool
 ARCH="$ARCH" ./"$APPIMAGETOOL" "$APPDIR" "$OUTPUT"
 
-# Cleanup
-rm -rf "$APPDIR" "$APPDIR".mount
+# # Cleanup
+# rm -rf "$APPDIR" "$APPDIR".mount
 
 echo "Done! Created: $OUTPUT"
