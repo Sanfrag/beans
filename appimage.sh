@@ -30,6 +30,8 @@ case "$BEAN" in
         ;;
 esac
 
+APP_NAME=${DISPLAY_NAME,,}
+
 # Paths
 BUILD_DIR="build/${BEAN}-linux-${ARCH_NAME}"
 APPDIR="AppDir-${BEAN}"
@@ -45,6 +47,12 @@ mkdir -p "$APPDIR"
 echo "Copying build files..."
 cp -r "$BUILD_DIR"/* "$APPDIR/"
 
+# Update package.json: replace BEAN with DISPLAY_NAME
+if [ -f "$APPDIR/package.nw/package.json" ]; then
+    echo "Updating package.json..."
+    sed -i "s/$BEAN/$APP_NAME/g" "$APPDIR/package.nw/package.json"
+fi
+
 
 # Create AppRun wrapper
 cat > "$APPDIR/AppRun" << 'EOF'
@@ -55,16 +63,16 @@ export PATH="${HERE}:${PATH}"
 export LD_LIBRARY_PATH="${HERE}/lib:${LD_LIBRARY_PATH}"
 exec "${HERE}/<<BINARY>>" "$@"
 EOF
-sed -i "s/<<BINARY>>/$DISPLAY_NAME/g" "$APPDIR/AppRun"
+sed -i "s/<<BINARY>>/$APP_NAME/g" "$APPDIR/AppRun"
 chmod +x "$APPDIR/AppRun"
 
 # Create .desktop file
-cat > "$APPDIR/${DISPLAY_NAME}.desktop" << EOF
+cat > "$APPDIR/${APP_NAME}.desktop" << EOF
 [Desktop Entry]
 Name=${DISPLAY_NAME}
 Comment=${DESCRIPTION}
 Exec=AppRun %F
-Icon=${DISPLAY_NAME}
+Icon=${APP_NAME}
 Type=Application
 Terminal=false
 Categories=Graphics;
@@ -121,12 +129,12 @@ mkdir -p "$APPDIR/usr/share/icons/hicolor"
 for size in 16 32 64 128 256 512; do
     mkdir -p "$APPDIR/usr/share/icons/hicolor/${size}x${size}/apps"
     if [ -f "icons/${size}/${BEAN}.png" ]; then
-        cp "icons/${size}/${BEAN}.png" "$APPDIR/usr/share/icons/hicolor/${size}x${size}/apps/${BEAN}.png"
+        cp "icons/${size}/${BEAN}.png" "$APPDIR/usr/share/icons/hicolor/${size}x${size}/apps/${APP_NAME}.png"
     fi
 done
 
 # Also copy to AppDir root
-cp "icons/512/${BEAN}.png" "$APPDIR/${DISPLAY_NAME}.png"
+cp "icons/512/${BEAN}.png" "$APPDIR/${APP_NAME}.png"
 
 # Build AppImage (NW.js doesn't need GTK, so we skip the plugin and use appimagetool directly)
 echo "Building AppImage..."
@@ -144,13 +152,10 @@ mkdir -p "$APPDIR/usr/bin" "$APPDIR/usr/lib" "$APPDIR/usr/share/applications" "$
 mv "$APPDIR"/*.so* "$APPDIR"/usr/lib/ 2>/dev/null || true
 
 # Copy .desktop and icon to standard locations
-cp "$APPDIR/${DISPLAY_NAME}.desktop" "$APPDIR/usr/share/applications/"
-cp "$APPDIR/${DISPLAY_NAME}.png" "$APPDIR/usr/share/pixmaps/"
+cp "$APPDIR/${APP_NAME}.desktop" "$APPDIR/usr/share/applications/"
+cp "$APPDIR/${APP_NAME}.png" "$APPDIR/usr/share/pixmaps/"
 
 # Build with appimagetool
-ARCH="$ARCH" ./"$APPIMAGETOOL" "$APPDIR" "$OUTPUT"
-
-# # Cleanup
-# rm -rf "$APPDIR" "$APPDIR".mount
+ARCH="$ARCH" VERSION="$VERSION" ./"$APPIMAGETOOL" "$APPDIR" "$OUTPUT"
 
 echo "Done! Created: $OUTPUT"

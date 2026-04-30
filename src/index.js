@@ -1009,7 +1009,7 @@ const openHandler = (args) => {
         }
       }
       parts.push(cur);
-      return parts.filter(
+      return parts.slice(1).filter(
         (part) =>
           !part.startsWith("-") &&
           part != "nw" &&

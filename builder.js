@@ -9,6 +9,9 @@ const versionMatch = flakeNix.match(/^\s*version\s*=\s*"([^"]+)"/m);
 const version = versionMatch ? versionMatch[1] : "0.0.0";
 console.log(version);
 
+const displayName = bean === 'vbean' ? atob("VmVjdG9ycGVh") : atob("UGhvdG9wZWE");
+const appName = displayName.toLowerCase();
+
 nwbuild({
   mode: "build",
   flavor: "sdk",
@@ -20,7 +23,7 @@ nwbuild({
   outDir: `./build/${bean}-${platform}-${arch}`,
   argv: process.argv.slice(5),
   app: {
-    name: bean === 'vbean' ? atob("VmVjdG9ycGVh") : atob("UGhvdG9wZWE"),
+    name: appName,
     fileDescription: bean === 'vbean' ? atob("VmVjdG9yIGdyYXBoaWNzIGVkaXRvcg") : atob("UmFzdGVyIGdyYXBoaWNzIGVkaXRvcg"),
     icon: `./icons/512/${bean}.png`,
     LSApplicationCategoryType: "public.app-category.graphics-design",
