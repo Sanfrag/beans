@@ -55,13 +55,53 @@ fi
 
 
 # Create AppRun wrapper
+#
+# Do NOT exec the binary: the AppImage runtime unmounts the embedded squashfs
+# as soon as AppRun exits, but NW.js keeps chrome_crashpad_handler alive for a
+# few seconds after the main process is gone. If the mount goes away first,
+# those handlers fault on code pages from the vanished filesystem and die with
+# SIGBUS, dumping a core on every quit. Keeping this shell alive keeps the
+# mount alive until the handlers are done.
 cat > "$APPDIR/AppRun" << 'EOF'
 #!/bin/bash
 SELF=$(readlink -f "$0")
 HERE=${SELF%/*}
 export PATH="${HERE}:${PATH}"
 export LD_LIBRARY_PATH="${HERE}/lib:${LD_LIBRARY_PATH}"
-exec "${HERE}/<<BINARY>>" "$@"
+
+"${HERE}/<<BINARY>>" "$@" &
+APP_PID=$!
+trap 'kill -TERM "$APP_PID" 2>/dev/null' TERM INT HUP
+
+wait "$APP_PID"
+STATUS=$?
+
+# Match by exe inode; a command line may contain the path for other reasons.
+# comm is a cheap builtin-read prefilter (kernel truncates it to 15 chars).
+handler_ids() {
+    local want p pid comm
+    want=$(stat -Lc '%d:%i' "${HERE}/chrome_crashpad_handler" 2>/dev/null) || return 0
+    for p in /proc/[0-9]*; do
+        pid=${p##*/}
+        read -r comm < "$p/comm" 2>/dev/null || continue
+        [ "$comm" = chrome_crashpad ] || continue
+        [ "$(stat -Lc '%d:%i' "$p/exe" 2>/dev/null)" = "$want" ] && echo "$pid"
+    done
+}
+
+gone() { ! kill -0 "$APP_PID" 2>/dev/null; }
+
+# Usually well under a second, but --monitor-self may outlive the browser by
+# several seconds; cap the wait so quit can never hang indefinitely.
+for _ in $(seq 1 150); do
+    ids=$(handler_ids)
+    [ -z "$ids" ] && gone && break
+    sleep 0.1
+done
+ids=$(handler_ids); [ -n "$ids" ] && kill -TERM $ids 2>/dev/null
+wait "$APP_PID" 2>/dev/null || true
+
+exit "$STATUS"
 EOF
 sed -i "s/<<BINARY>>/$APP_NAME/g" "$APPDIR/AppRun"
 chmod +x "$APPDIR/AppRun"
