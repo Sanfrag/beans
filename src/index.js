@@ -857,9 +857,7 @@ const handleTransform = async (req, res, type, time, fn) => {
     }
 
     if (needsUpdate) {
-      const downloadUrl = `${__r(
-        "aHR0cHM6Ly92ZWNwZWEuY29tL2NvZGUv"
-      )}${type}/${fn}`;
+      const downloadUrl = `${__r("<<target>>")}${__r("L2NvZGUv")}${type}/${fn}`;
 
       try {
         console.log(`Updating ${type}...`);
